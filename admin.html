@@ -959,7 +959,19 @@ function renderOrderGroup(
                 </td>
 
                 <td>
-                    ${order.items.join('<br>')}
+                    ${order.items.map(itemStr => `
+                        <label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;user-select:none;">
+                            <input
+                                type="checkbox"
+                                onchange="toggleItemDone(this)"
+                                style="width:17px;height:17px;accent-color:#2ecc71;cursor:pointer;flex-shrink:0;">
+                            <span style="transition:0.2s;">${itemStr}</span>
+                        </label>
+                    `).join('')}
+                    ${order.note && order.note !== '無'
+                        ? `<div style="margin-top:6px;padding:6px 10px;background:#fff3e8;border-left:3px solid #e67e22;border-radius:4px;font-size:12px;color:#b35a00;">📝 ${order.note}</div>`
+                        : ''
+                    }
                 </td>
 
                 <td>
@@ -1355,6 +1367,17 @@ global order data
 Output:
 render charts
 */
+function toggleItemDone(checkbox){
+    const span = checkbox.nextElementSibling;
+    if(checkbox.checked){
+        span.style.textDecoration = 'line-through';
+        span.style.color = '#b2bec3';
+    } else {
+        span.style.textDecoration = 'none';
+        span.style.color = '';
+    }
+}
+
 function calculateAndRenderCharts(){
 
     let totalRevenue = 0;

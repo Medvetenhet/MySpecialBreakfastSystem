@@ -412,6 +412,17 @@ body{
                 id="pickupTime">
         </div>
 
+        <div class="form-group">
+            <label>備註（選填）</label>
+
+            <textarea
+                id="customerNote"
+                class="form-control"
+                placeholder="例：不要加蔥、少冰、加辣..."
+                rows="3"
+                style="resize:vertical;"></textarea>
+        </div>
+
         <button 
             class="submit-btn"
             onclick="submitOrder()">
@@ -625,62 +636,7 @@ function changeQuantity(index,delta){
 
     if(cart[index].quantity <= 0){
 
-       
-// Customer cancel order
-// input:
-// order id
-// output:
-// mark order as cancelled
-app.delete('/api/order/:id', (req, res) => {
-
-    const orderId =
-        req.params.id;
-
-    const order =
-        globalOrders.find(
-            o => o.id === orderId
-        );
-
-    if (order) {
-
-        // Change order status
-        // input:
-        // pending order
-        // output:
-        // cancelled status
-        order.status =
-            'cancelled';
-
-        console.log(
-            `❌ 訂單 ${orderId} 已被顧客取消`
-        );
-
-        // Broadcast realtime update
-        // input:
-        // cancelled order
-        // output:
-        // refresh admin dashboard
-        adminClients.forEach(client => {
-
-            client.write(
-                `data: order-cancelled\n\n`
-            );
-
-        });
-
-        return res.json({
-            success: true
-        });
-
-    }
-
-    res.status(404).json({
-        success: false
-    });
-
-});
-
-
+        cart.splice(index, 1);
 
     }
 
@@ -902,7 +858,8 @@ if (!phoneRegex.test(phone)) { alert( '📱 手機號碼格式錯誤！\n請輸�
         pickupTime:pickupTime,
 
         items: cart.map(item => { return `${item.name} (數量:${item.quantity}, 單價:${item.price})`; }),
-        total:calculateTotal()
+        total:calculateTotal(),
+        note: document.getElementById('customerNote').value.trim() || '無'
 
     };
 
@@ -957,6 +914,10 @@ if (!phoneRegex.test(phone)) { alert( '📱 手機號碼格式錯誤！\n請輸�
 
             document.getElementById(
                 'pickupTimeSelect'
+            ).value = '';
+
+            document.getElementById(
+                'customerNote'
             ).value = '';
 
         }else{
