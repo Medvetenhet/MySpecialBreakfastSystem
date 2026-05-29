@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>早點到 - 早餐點餐系統</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f5f6f8;
+    color:#2d3436;
+    padding:24px;
+}
+
+.page-title{
+    text-align:center;
+    font-size:38px;
+    font-weight:800;
+    color:#e67e22;
+    margin-bottom:32px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:1fr 380px;
+    gap:24px;
+}
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:20px;
+}
+
+.product-card{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    transition:0.2s;
+}
+
+.product-card:hover{
+    transform:translateY(-4px);
+}
+
+.product-img{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+}
+
+.product-info{
+    padding:18px;
+}
+
+.product-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.product-title{
+    font-size:17px;
+    font-weight:700;
+}
+
+.status{
+    font-size:12px;
+    font-weight:700;
+}
+
+.status.active{
+    color:#2ecc71;
+}
+
+.status.inactive{
+    color:#e74c3c;
+}
+
+.price{
+    color:#e67e22;
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:16px;
+}
+
+.add-to-cart-btn{
+    width:100%;
+    border:none;
+    background:#e67e22;
+    color:white;
+    padding:12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:700;
+    transition:0.2s;
+}
+
+.add-to-cart-btn:hover{
+    background:#d35400;
+}
+
+.disabled-btn{
+    background:#b2bec3;
+    cursor:not-allowed;
+}
+
+.cart-section{
+    background:white;
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    height:fit-content;
+    position:sticky;
+    top:20px;
+}
+
+.cart-title{
+    font-size:28px;
+    font-weight:800;
+    margin-bottom:20px;
+}
+
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 0;
+    border-bottom:1px solid #f1f2f6;
+}
+
+.cart-info{
+    flex:1;
+}
+
+.cart-name{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.cart-price{
+    color:#636e72;
+    font-size:14px;
+}
+
+.qty-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.qty-btn{
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:50%;
+    background:#f1f2f6;
+    cursor:pointer;
+    font-size:18px;
+    transition:0.2s;
+}
+
+.qty-btn:hover{
+    background:#dfe6e9;
+}
+
+.total-box{
+    margin-top:24px;
+    padding-top:20px;
+    border-top:2px solid #f1f2f6;
+}
+
+.total-row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+.total-label{
+    font-size:18px;
+    font-weight:700;
+}
+
+.total-price{
+    font-size:34px;
+    font-weight:800;
+}
+
+.form-group{
+    margin-top:18px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+    font-weight:700;
+}
+
+.form-control{
+    width:100%;
+    padding:14px;
+    border:1px solid #dfe6e9;
+    border-radius:12px;
+    font-size:15px;
+    outline:none;
+}
+
+.form-control:focus{
+    border-color:#e67e22;
+}
+
+.submit-btn{
+    width:100%;
+    margin-top:24px;
+    background:#e67e22;
+    color:white;
+    border:none;
+    border-radius:14px;
+    padding:16px;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.submit-btn:hover{
+    background:#d35400;
+}
+
+.empty-cart{
+    text-align:center;
+    color:#b2bec3;
+    padding:30px 0;
+}
+
+.search-box{
+    background:#f8f9fa;
+    padding:16px;
+    border-radius:14px;
+    margin-bottom:24px;
+}
+
+.search-title{
+    font-size:13px;
+    margin-bottom:10px;
+    color:#636e72;
+}
+
+.search-row{
+    display:flex;
+    gap:10px;
+}
+
+.search-btn{
+    border:none;
+    background:#3498db;
+    color:white;
+    padding:0 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.active-order-box{
+    margin-top:24px;
+    padding-top:20px;
+    border-top:2px dashed #dfe6e9;
+}
+
+.cancel-btn{
+    width:100%;
+    margin-top:12px;
+    border:none;
+    background:#ff7675;
+    color:white;
+    padding:12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+@media(max-width:900px){
+
+    .container{
+        grid-template-columns:1fr;
+    }
+
+    .cart-section{
+        position:static;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<h1 class="page-title">
+    🍳 早點到
+</h1>
+
+<div class="container">
+
+    <div>
+        <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <div class="cart-section">
+
+        <div class="search-box">
+
+            <div class="search-title">
+                查詢 / 取消歷史訂單
+            </div>
+
+            <div class="search-row">
+                <input 
+                    type="text"
+                    id="searchPhone"
+                    class="form-control"
+                    placeholder="輸入手機號碼">
+
+                <button 
+                    class="search-btn"
+                    onclick="searchAndCancelOrder()">
+                    搜尋
+                </button>
+            </div>
+
+        </div>
+
+        <div class="cart-title">
+            您的購物車
+        </div>
+
+        <div id="cartItems"></div>
+
+        <div class="total-box">
+
+            <div class="total-row">
+                <span class="total-label">
+                    總金額
+                </span>
+
+                <span 
+                    class="total-price"
+                    id="cartTotal">
+                    NT$ 0
+                </span>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>手機號碼</label>
+
+            <input 
+                type="text"
+                id="customerPhone"
+                class="form-control"
+                placeholder="0912345678">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+
+            <input 
+                type="email"
+                id="customerEmail"
+                class="form-control"
+                placeholder="name@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>預計取餐時間</label>
+
+            <select 
+                id="pickupTimeSelect"
+                class="form-control"
+                onchange="calculatePickupTime()">
+
+                <option value="">請選擇時間</option>
+                <option value="5">5 分鐘後</option>
+                <option value="10">10 分鐘後</option>
+                <option value="15">15 分鐘後</option>
+                <option value="20">20 分鐘後</option>
+                <option value="30">30 分鐘後</option>
+                <option value="45">45 分鐘後</option>
+                <option value="60">1 小時後</option>
+
+            </select>
+
+            <input 
+                type="hidden"
+                id="pickupTime">
+        </div>
+
+        <button 
+            class="submit-btn"
+            onclick="submitOrder()">
+
+            🚀 送出早餐訂單
+
+        </button>
+
+        <div 
+            class="active-order-box"
+            id="activeOrderBox"
+            style="display:none;">
+
+            <div style="font-size:13px;color:#636e72;">
+                目前訂單編號
+            </div>
+
+            <div 
+                id="currentOrderId"
+                style="font-size:18px;font-weight:800;margin-top:8px;">
+            </div>
+
+            <button 
+                class="cancel-btn"
+                onclick="cancelMyCurrentOrder()">
+
+                ❌ 取消目前訂單
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let cart = [];
+
+let currentSubmittedOrderId = null;
+
+/*
+Function:
+Load menu data from backend API
+
+Input:
+none
+
+Output:
+render menu UI
+*/
+async function loadMenu(){
+
+    try{
+
+        const response = await fetch('/api/menu');
+
+        const items = await response.json();
+
+        renderMenu(items);
+
+    }catch(error){
+
+        alert('菜單載入失敗');
+
+    }
+
+}
+
+/*
+Function:
+Render product menu cards
+
+Input:
+items -> menu array from backend
+
+Output:
+render product cards into page
+*/
+function renderMenu(items){
+
+    const container = document.getElementById('menuGrid');
+
+    container.innerHTML = '';
+
+    items.forEach(item=>{
+
+        const card = document.createElement('div');
+
+        card.className = 'product-card';
+
+        const statusClass = item.active
+            ? 'active'
+            : 'inactive';
+
+        const statusText = item.active
+            ? '供應中'
+            : '已完售';
+
+        const buttonHtml = item.active
+            ? `
+                <button
+                    class="add-to-cart-btn"
+                    onclick="addToCart('${item.name}',${item.price})">
+
+                    加入購物車
+
+                </button>
+            `
+            : `
+                <button
+                    class="add-to-cart-btn disabled-btn"
+                    disabled>
+
+                    已完售
+
+                </button>
+            `;
+
+        const imgPath = item.img.startsWith('http')
+            ? item.img
+            : `${window.location.origin}/${item.img}`;
+
+        card.innerHTML = `
+
+            <img 
+                src="${imgPath}"
+                class="product-img"
+                onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+
+            <div class="product-info">
+
+                <div class="product-top">
+
+                    <div class="product-title">
+                        ${item.name}
+                    </div>
+
+                    <div class="status ${statusClass}">
+                        ${statusText}
+                    </div>
+
+                </div>
+
+                <div class="price">
+                    NT$ ${item.price}
+                </div>
+
+                ${buttonHtml}
+
+            </div>
+
+        `;
+
+        container.appendChild(card);
+
+    });
+
+}
+
+/*
+Function:
+Add product into shopping cart
+
+Input:
+name -> product name
+price -> product price
+
+Output:
+update shopping cart UI
+*/
+function addToCart(name,price){
+
+    const existing = cart.find(
+        item=>item.name===name
+    );
+
+    if(existing){
+
+        existing.quantity++;
+
+    }else{
+
+        cart.push({
+            name:name,
+            price:price,
+            quantity:1
+        });
+
+    }
+
+    updateCartUI();
+
+}
+
+/*
+Function:
+Modify cart item quantity
+
+Input:
+index -> cart item index
+delta -> quantity change value
+
+Output:
+update cart UI
+*/
+function changeQuantity(index,delta){
+
+    cart[index].quantity += delta;
+
+    if(cart[index].quantity <= 0){
+
+       
+// Customer cancel order
+// input:
+// order id
+// output:
+// mark order as cancelled
+app.delete('/api/order/:id', (req, res) => {
+
+    const orderId =
+        req.params.id;
+
+    const order =
+        globalOrders.find(
+            o => o.id === orderId
+        );
+
+    if (order) {
+
+        // Change order status
+        // input:
+        // pending order
+        // output:
+        // cancelled status
+        order.status =
+            'cancelled';
+
+        console.log(
+            `❌ 訂單 ${orderId} 已被顧客取消`
+        );
+
+        // Broadcast realtime update
+        // input:
+        // cancelled order
+        // output:
+        // refresh admin dashboard
+        adminClients.forEach(client => {
+
+            client.write(
+                `data: order-cancelled\n\n`
+            );
+
+        });
+
+        return res.json({
+            success: true
+        });
+
+    }
+
+    res.status(404).json({
+        success: false
+    });
+
+});
+
+
+
+    }
+
+    updateCartUI();
+
+}
+
+/*
+Function:
+Update shopping cart UI
+
+Input:
+none
+
+Output:
+render cart items and total price
+*/
+function updateCartUI(){
+
+    const box = document.getElementById('cartItems');
+
+    box.innerHTML = '';
+
+    if(cart.length === 0){
+
+        box.innerHTML = `
+            <div class="empty-cart">
+                購物車目前沒有餐點
+            </div>
+        `;
+
+        document.getElementById('cartTotal').innerText =
+            'NT$ 0';
+
+        return;
+
+    }
+
+    cart.forEach((item,index)=>{
+
+        box.innerHTML += `
+
+            <div class="cart-item">
+
+                <div class="cart-info">
+
+                    <div class="cart-name">
+                        ${item.name}
+                    </div>
+
+                    <div class="cart-price">
+                        NT$ ${item.price} × ${item.quantity}
+                    </div>
+
+                </div>
+
+                <div class="qty-box">
+
+                    <button 
+                        class="qty-btn"
+                        onclick="changeQuantity(${index},-1)">
+                        -
+                    </button>
+
+                    <span>${item.quantity}</span>
+
+                    <button 
+                        class="qty-btn"
+                        onclick="changeQuantity(${index},1)">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    document.getElementById('cartTotal').innerText =
+        `NT$ ${calculateTotal()}`;
+
+}
+
+/*
+Function:
+Calculate shopping cart total price
+
+Input:
+none
+
+Output:
+return total price number
+*/
+function calculateTotal(){
+
+    return cart.reduce(
+        (sum,item)=>
+            sum + item.price * item.quantity,
+        0
+    );
+
+}
+
+/*
+Function:
+Clear shopping cart data
+
+Input:
+none
+
+Output:
+reset cart UI
+*/
+function clearCart(){
+
+    cart = [];
+
+    updateCartUI();
+
+}
+
+/*
+Function:
+Calculate pickup time automatically
+
+Input:
+none
+
+Output:
+store calculated time into hidden input
+*/
+function calculatePickupTime(){
+
+    const minutesLater =
+        document.getElementById(
+            'pickupTimeSelect'
+        ).value;
+
+    const hiddenInput =
+        document.getElementById(
+            'pickupTime'
+        );
+
+    if(!minutesLater){
+
+        hiddenInput.value = '';
+
+        return;
+
+    }
+
+    const now = new Date();
+
+    now.setMinutes(
+        now.getMinutes() + parseInt(minutesLater)
+    );
+
+    const hours =
+        String(now.getHours()).padStart(2,'0');
+
+    const minutes =
+        String(now.getMinutes()).padStart(2,'0');
+
+    hiddenInput.value =
+        `${hours}:${minutes}`;
+
+}
+
+/*
+Function:
+Submit order to backend API
+
+Input:
+none
+
+Output:
+send order data to backend server
+*/
+async function submitOrder(){
+
+    if(cart.length === 0){
+
+        alert('購物車是空的');
+
+        return;
+
+    }
+
+    const phone =
+        document.getElementById(
+            'customerPhone'
+        ).value.trim();
+
+    const email =
+        document.getElementById(
+            'customerEmail'
+        ).value.trim();
+
+    const pickupTime =
+        document.getElementById(
+            'pickupTime'
+        ).value;
+        const phoneRegex = /^09\d{8}$/;
+if (!phoneRegex.test(phone)) { alert( '📱 手機號碼格式錯誤！\n請輸入正確的台灣手機號碼' ); return; } if(!phone || !pickupTime){ alert('請填寫手機與取餐時間'); return; }
+
+    const payload = {
+
+        id:
+            'ORD-' +
+            Date.now(),
+
+        phone:phone,
+
+        email:
+            email || '未填寫',
+
+        pickupTime:pickupTime,
+
+        items: cart.map(item => { return `${item.name} (數量:${item.quantity}, 單價:${item.price})`; }),
+        total:calculateTotal()
+
+    };
+
+    try{
+
+        const response =
+            await fetch('/api/order',{
+
+                method:'POST',
+
+                headers:{
+                    'Content-Type':'application/json'
+                },
+
+                body:JSON.stringify(payload)
+
+            });
+
+        const result =
+            await response.json();
+
+        if(result.success){
+
+            alert(
+                result.message +
+                '\n訂單編號：' +
+                payload.id
+            );
+
+            currentSubmittedOrderId =
+                payload.id;
+
+            document.getElementById(
+                'currentOrderId'
+            ).innerText =
+                payload.id;
+
+            document.getElementById(
+                'activeOrderBox'
+            ).style.display =
+                'block';
+
+            clearCart();
+
+            document.getElementById(
+                'customerPhone'
+            ).value = '';
+
+            document.getElementById(
+                'customerEmail'
+            ).value = '';
+
+            document.getElementById(
+                'pickupTimeSelect'
+            ).value = '';
+
+        }else{
+
+            alert(result.message);
+
+        }
+
+    }catch(error){
+
+        alert('訂單送出失敗');
+
+    }
+
+}
+
+/*
+Function:
+Cancel current active order
+
+Input:
+none
+
+Output:
+send delete request to backend
+*/
+async function cancelMyCurrentOrder(){
+
+    if(!currentSubmittedOrderId){
+
+        return;
+
+    }
+
+    if(!confirm('確定取消訂單？')){
+
+        return;
+
+    }
+
+    try{
+
+        const response =
+            await fetch(
+
+                `/api/order/${currentSubmittedOrderId}`,
+
+                {
+                    method:'DELETE'
+                }
+
+            );
+
+        if(response.ok){
+
+            alert('訂單已取消');
+
+            currentSubmittedOrderId = null;
+
+            document.getElementById(
+                'activeOrderBox'
+            ).style.display = 'none';
+
+        }
+
+    }catch(error){
+
+        alert('取消失敗');
+
+    }
+
+}
+
+/*
+Function:
+Search order by phone number and cancel order
+
+Input:
+none
+
+Output:
+search pending order and cancel it
+*/
+async function searchAndCancelOrder(){
+
+    const phone =
+        document.getElementById(
+            'searchPhone'
+        ).value.trim();
+
+    if(!phone){
+
+        alert('請輸入手機號碼');
+
+        return;
+
+    }
+
+    try{
+
+        const response =
+            await fetch('/api/admin/orders');
+
+        const orders =
+            await response.json();
+
+        const myOrder =
+            orders.find(
+
+                order=>
+                    order.phone===phone &&
+                    order.status==='pending'
+
+            );
+
+        if(!myOrder){
+
+            alert('找不到待處理訂單');
+
+            return;
+
+        }
+
+        if(confirm(`確定取消 ${myOrder.id} ?`)){
+
+            const deleteResponse =
+                await fetch(
+
+                    `/api/order/${myOrder.id}`,
+
+                    {
+                        method:'DELETE'
+                    }
+
+                );
+
+            if(deleteResponse.ok){
+
+                alert('訂單已取消');
+
+            }
+
+        }
+
+    }catch(error){
+
+        alert('搜尋失敗');
+
+    }
+
+}
+
+window.onload = function(){
+
+    loadMenu();
+
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+[
+    {
+        "id": "p1",
+        "name": "培根蛋餅",
+        "price": 45,
+        "category": "egg-roll",
+        "img": "src/images/培根蛋餅.webp",
+        "active": true
+    },
+    {
+        "id": "p2",
+        "name": "起司蔬菜蛋餅",
+        "price": 50,
+        "category": "egg-roll",
+        "img": "src/images/起司蔬菜蛋餅.webp",
+        "active": true
+    },
+    {
+        "id": "p3",
+        "name": "起司豬排堡",
+        "price": 65,
+        "category": "burger",
+        "img": "src/images/起司豬排堡.webp",
+        "active": true
+    },
+    {
+        "id": "p4",
+        "name": "火腿蛋吐司",
+        "price": 45,
+        "category": "toast",
+        "img": "src/images/火腿蛋吐司.webp",
+        "active": true
+    },
+    {
+        "id": "p5",
+        "name": "鮪魚蛋吐司",
+        "price": 50,
+        "category": "toast",
+        "img": "src/images/鮪魚蛋吐司.webp",
+        "active": true
+    },
+    {
+        "id": "p6",
+        "name": "蘿蔔糕加蛋",
+        "price": 55,
+        "category": "snack",
+        "img": "src/images/蘿蔔糕加蛋.webp",
+        "active": true
+    },
+    {
+        "id": "p7",
+        "name": "古早味紅茶",
+        "price": 20,
+        "category": "drink",
+        "img": "src/images/紅茶.webp",
+        "active": true
+    },
+    {
+        "id": "p8",
+        "name": "招牌奶茶",
+        "price": 25,
+        "category": "drink",
+        "img": "src/images/奶茶.webp",
+        "active": true
+    },
+    {
+        "id": "p9",
+        "name": "鮮奶茶",
+        "price": 35,
+        "category": "drink",
+        "img": "src/images/鮮奶茶.webp",
+        "active": true
+    },
+    {
+        "id": "p10",
+        "name": "研磨拿鐵咖啡 (熱)",
+        "price": 55,
+        "category": "drink",
+        "img": "src/images/熱拿鐵咖啡.webp",
+        "active": true
+    },
+    {
+        "id": "p11",
+        "name": "冰美式咖啡",
+        "price": 45,
+        "category": "drink",
+        "img": "src/images/冰美式咖啡.webp",
+        "active": true
+    },
+    {
+        "id": "p12",
+        "name": "香醇豆漿",
+        "price": 20,
+        "category": "drink",
+        "img": "src/images/豆漿.webp",
+        "active": true
+    }
+]
