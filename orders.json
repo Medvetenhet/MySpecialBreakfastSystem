@@ -10,5 +10,19 @@
         "total": 130,
         "status": "cancelled",
         "createdAt": "2026-06-04T07:42:06.724Z"
+    },
+    {
+        "id": "ORD-1780559424575",
+        "phone": "0968926667",
+        "email": "anthony.ho667@gmail.com",
+        "pickupTime": "15:55",
+        "items": [
+            "起司蔬菜蛋餅 (數量:1, 單價:50)",
+            "火腿蛋吐司 (數量:1, 單價:45)",
+            "鮪魚蛋吐司 (數量:2, 單價:50)"
+        ],
+        "total": 195,
+        "status": "done",
+        "createdAt": "2026-06-04T07:50:24.620Z"
     }
 ]
