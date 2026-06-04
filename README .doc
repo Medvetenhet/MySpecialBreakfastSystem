@@ -1,0 +1,165 @@
+# 🍳 早點到 — 早餐店點餐系統
+
+一個以 Node.js + Express 建構的輕量級早餐店點餐系統，具備顧客點餐前台與管理員後台，支援即時訂單推播與完整 CRUD 操作。
+
+---
+
+## 📁 專案結構
+
+```
+breakfastSystem/
+├── server.js            # 後端主程式（Express API）
+├── index.html           # 顧客點餐前台
+├── admin.html           # 管理員後台
+├── menu.json            # 菜單資料（持久化）
+├── categories.json      # 分類資料（持久化）
+├── orders.json          # 訂單資料（持久化，啟動時自動建立）
+├── uploads/             # 上傳圖片存放目錄（啟動時自動建立）
+├── src/images/          # 預設餐點圖片
+└── package.json         # 專案設定
+```
+
+---
+
+## 🛠️ 使用技術
+
+| 技術 | 說明 |
+|------|------|
+| **Node.js** | 伺服器端 JavaScript 執行環境 |
+| **Express.js** | 輕量 Web 框架，處理路由與中介軟體 |
+| **Multer** | 處理 `multipart/form-data` 圖片上傳 |
+| **Server-Sent Events (SSE)** | 後端主動推播即時訂單通知給管理後台 |
+| **Fetch API** | 前端非同步呼叫 REST API（原生瀏覽器 API）|
+| **JSON 檔案** | 輕量資料儲存方案（menu / categories / orders）|
+
+---
+
+## ⚙️ 核心架構原理
+
+### 1. REST API 設計
+
+後端遵循 REST 風格，以 HTTP 動詞表達操作意圖：
+
+| HTTP 方法 | 路由 | 功能 |
+|-----------|------|------|
+| `GET` | `/api/menu` | 讀取菜單 |
+| `GET` | `/api/categories` | 讀取分類 |
+| `POST` | `/api/order` | 顧客送出訂單 |
+| `DELETE` | `/api/order/:id` | 顧客取消訂單 |
+| `GET` | `/api/admin/orders` | 管理員查看訂單 |
+| `PUT` | `/api/admin/orders/:id` | 標記訂單完成 |
+| `DELETE` | `/api/admin/orders/clearall` | 清空所有訂單 |
+| `POST` | `/api/admin/menu` | 新增餐點（含圖片）|
+| `PUT` | `/api/admin/menu/:id` | 編輯餐點資訊 |
+| `DELETE` | `/api/admin/menu/:id` | 刪除餐點 |
+| `PUT` | `/api/admin/menu/toggle/:id` | 切換供應狀態 |
+| `POST` | `/api/admin/categories` | 新增分類 |
+| `DELETE` | `/api/admin/categories/:id` | 刪除分類 |
+
+### 2. 前後端分離
+
+```
+顧客 (index.html)              管理員 (admin.html)
+     │                               │
+     │   fetch('/api/...')           │   fetch('/api/admin/...')
+     ↓                               ↓
+                  server.js (Express)
+                  ├── 路由處理
+                  ├── 讀寫 JSON 檔
+                  └── SSE 推播
+```
+
+前端透過原生 `fetch()` 呼叫後端 API，後端回傳 JSON，雙方完全分離，無模板引擎。
+
+### 3. 即時推播（Server-Sent Events）
+
+管理後台建立持久 SSE 連線（`/api/admin/stream`），當有新訂單或訂單狀態更新時，後端主動推播事件，前端無需輪詢：
+
+```
+顧客送出訂單
+   → POST /api/order
+   → server.js 寫入 orders.json
+   → SSE 廣播 "new-order"
+   → admin.html 即時重整訂單列表
+```
+
+### 4. 資料持久化（原子寫入）
+
+菜單、分類、訂單均以 JSON 檔案儲存，重啟後資料不遺失。寫入採用「先寫暫存檔再 rename」的原子操作，避免寫入中途崩潰導致 JSON 損壞：
+
+```javascript
+function writeJSON(filePath, data) {
+    const tmp = filePath + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 4), 'utf8');
+    fs.renameSync(tmp, filePath);  // 原子替換
+}
+```
+
+### 5. 圖片上傳（Multer）
+
+使用 Multer 處理 `multipart/form-data`：
+- 僅接受 `.jpg` / `.jpeg`（由 `fileFilter` 把關）
+- 檔名自動命名為 `餐點名稱.jpg`，存至 `uploads/` 目錄
+- 檔名經 `sanitizeFilename()` 過濾特殊字元，防止路徑穿越攻擊
+
+### 6. 下架防禦機制
+
+顧客送出訂單時，後端會逐一核對品項是否仍在供應中。若有商品在下單過程中被管理員下架，系統會攔截並回傳錯誤，確保不接受無效訂單。
+
+---
+
+## 🚀 安裝與啟動
+
+**系統需求：** Node.js 16+
+
+```bash
+# 安裝相依套件
+npm install
+
+# 啟動伺服器
+npm start
+```
+
+啟動後開啟瀏覽器：
+
+- 顧客前台：http://localhost:3000
+- 管理後台：http://localhost:3000/admin.html
+
+---
+
+## 📋 功能說明
+
+### 顧客端（index.html）
+
+- 依分類瀏覽菜單，完售品項自動標示
+- 加入購物車，調整數量，即時計算總價
+- 送出訂單，取得訂單編號
+- 以訂單編號查詢狀態或取消訂單
+
+### 管理員端（admin.html）
+
+- **訂單管理**：即時接收新訂單通知、標記完成、清空全部訂單
+- **菜單管理**：新增（含圖片上傳）、編輯、刪除、上下架餐點
+- **分類管理**：新增、刪除餐點分類
+
+---
+
+## 📦 相依套件
+
+| 套件 | 版本 | 用途 |
+|------|------|------|
+| express | ^4.19.2 | Web 框架 |
+| multer | ^2.1.1 | 圖片上傳處理 |
+
+---
+
+## 🔒 安全性說明
+
+| 項目 | 處理方式 |
+|------|----------|
+| 圖片格式驗證 | `fileFilter` 限制僅接受 jpg/jpeg |
+| 檔名安全 | `sanitizeFilename()` 過濾路徑穿越字元 |
+| 原子寫入 | tmp + rename 防止 JSON 寫入損壞 |
+| 下架防禦 | 送單時後端再次驗證品項供應狀態 |
+
+> ⚠️ 本系統為教學用途，管理後台目前無登入驗證。正式部署建議加入 session / JWT 認證機制。
