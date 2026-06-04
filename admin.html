@@ -306,6 +306,109 @@ header{
 
 }
 
+/* ── Modal ── */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:500;
+    justify-content:center;
+    align-items:center;
+}
+.modal-overlay.open{ display:flex; }
+.modal-box{
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    width:440px;
+    max-width:95vw;
+    box-shadow:0 8px 32px rgba(0,0,0,0.18);
+}
+.modal-title{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:20px;
+    color:#2d3436;
+}
+.modal-row{
+    margin-bottom:14px;
+}
+.modal-row label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:6px;
+    color:#636e72;
+}
+.modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+/* ── 分類管理區塊 ── */
+.cat-manager{
+    background:#f8f9fa;
+    border:2px dashed #3498db;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:28px;
+}
+.cat-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+}
+.cat-tag{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:white;
+    border:1px solid #dfe6e9;
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:14px;
+    font-weight:600;
+}
+.cat-tag .del-cat{
+    cursor:pointer;
+    color:#e74c3c;
+    font-size:16px;
+    line-height:1;
+    border:none;
+    background:none;
+    padding:0;
+}
+.cat-add-row{
+    display:flex;
+    gap:10px;
+}
+
+/* ── 分類篩選列（後台菜單管理上方）── */
+.filter-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+}
+.filter-btn{
+    border:2px solid #dfe6e9;
+    background:white;
+    border-radius:20px;
+    padding:7px 16px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.15s;
+}
+.filter-btn:hover,.filter-btn.active{
+    border-color:#e67e22;
+    background:#fff3e8;
+    color:#e67e22;
+}
+
 </style>
 
 </head>
@@ -460,88 +563,42 @@ header{
             class="tab-panel">
 
             <div class="panel-title">
-
                 <h2>🍳 菜單管理</h2>
-
             </div>
 
+            <!-- 分類管理 -->
+            <div class="cat-manager">
+                <div style="font-size:15px;font-weight:800;margin-bottom:12px;color:#2980b9;">🏷️ 分類管理</div>
+                <div class="cat-list" id="adminCatList"></div>
+                <div class="cat-add-row">
+                    <input type="text" id="newCatId"    class="form-control" placeholder="分類代碼（英文，如 set-meal）" style="flex:1;">
+                    <input type="text" id="newCatLabel" class="form-control" placeholder="顯示名稱（如 套餐）" style="flex:1;">
+                    <button class="btn btn-success" onclick="addCategory()">新增</button>
+                </div>
+            </div>
+
+            <!-- 新增餐點表單 -->
             <div class="form-box">
-
                 <div class="form-row">
-
-                    <input
-                        type="text"
-                        id="newMenuName"
-                        class="form-control"
-                        placeholder="商品名稱">
-
-                    <input
-                        type="number"
-                        id="newMenuPrice"
-                        class="form-control"
-                        placeholder="價格">
-
+                    <input type="text"   id="newMenuName"  class="form-control" placeholder="商品名稱">
+                    <input type="number" id="newMenuPrice" class="form-control" placeholder="價格">
                 </div>
-
                 <div class="form-row">
-
-                    <select
-                        id="newMenuCategory"
-                        class="form-control">
-
-                        <option value="egg-roll">
-                            美味蛋餅
-                        </option>
-
-                        <option value="burger">
-                            經典漢堡
-                        </option>
-
-                        <option value="toast">
-                            人氣吐司
-                        </option>
-
-                        <option value="drink">
-                            晨調飲品
-                        </option>
-
+                    <select id="newMenuCategory" class="form-control">
+                        <option value="">-- 請選擇分類 --</option>
                     </select>
-
                 </div>
-
                 <div class="form-row">
-
-                    <input
-                        type="file"
-                        id="newMenuImage"
-                        class="form-control"
-                        accept=".jpg,.jpeg">
-
+                    <input type="file" id="newMenuImage" class="form-control" accept=".jpg,.jpeg">
                 </div>
-
-                <p style="
-                    font-size:12px;
-                    color:#e74c3c;
-                    margin-bottom:16px;
-                ">
-                    ⚠️ 只允許 JPG / JPEG 圖片格式
-                </p>
-
-                <button
-                    class="btn btn-success"
-                    onclick="saveNewProductReal()">
-
-                    上架新商品
-
-                </button>
-
+                <p style="font-size:12px;color:#e74c3c;margin-bottom:16px;">⚠️ 只允許 JPG / JPEG 圖片格式</p>
+                <button class="btn btn-success" onclick="saveNewProductReal()">上架新商品</button>
             </div>
 
-            <div
-                class="menu-grid"
-                id="adminMenuGrid">
+            <!-- 分類篩選列 -->
+            <div class="filter-bar" id="adminFilterBar"></div>
 
-            </div>
+            <div class="menu-grid" id="adminMenuGrid"></div>
 
         </div>
 
@@ -619,10 +676,10 @@ header{
 
 const BACKOFFICE_PASSWORD = 'boss888';
 
-let globalOrdersData = [];
-
+let globalOrdersData  = [];
+let globalCategories  = [];
+let adminMenuFilter   = 'all';
 let revenueChartInstance = null;
-
 let productChartInstance = null;
 
 /*
@@ -732,11 +789,8 @@ Output:
 reload order and menu data
 */
 function refreshAdminData(){
-
     loadRealOrders();
-
-    loadRealMenu();
-
+    loadCategories();
 }
 
 /*
@@ -959,19 +1013,7 @@ function renderOrderGroup(
                 </td>
 
                 <td>
-                    ${order.items.map(itemStr => `
-                        <label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;user-select:none;">
-                            <input
-                                type="checkbox"
-                                onchange="toggleItemDone(this)"
-                                style="width:17px;height:17px;accent-color:#2ecc71;cursor:pointer;flex-shrink:0;">
-                            <span style="transition:0.2s;">${itemStr}</span>
-                        </label>
-                    `).join('')}
-                    ${order.note && order.note !== '無'
-                        ? `<div style="margin-top:6px;padding:6px 10px;background:#fff3e8;border-left:3px solid #e67e22;border-radius:4px;font-size:12px;color:#b35a00;">📝 ${order.note}</div>`
-                        : ''
-                    }
+                    ${order.items.join('<br>')}
                 </td>
 
                 <td>
@@ -1035,98 +1077,193 @@ async function completeOrderReal(orderId){
 
 }
 
-/*
-Function:
-Load menu data from backend
-
-Input:
-none
-
-Output:
-render menu cards
-*/
-async function loadRealMenu(){
-
+/* ── 分類：載入、渲染、新增、刪除 ── */
+async function loadCategories(){
     try{
-
-        const response =
-            await fetch('/api/menu');
-
-        const items =
-            await response.json();
-
-        renderAdminMenu(items);
-
-    }catch(error){
-
-        console.error(error);
-
-    }
-
+        const res  = await fetch('/api/categories');
+        globalCategories = await res.json();
+        renderCategoryManager();
+        renderAdminFilterBar();
+        populateCategoryDropdowns();
+        loadRealMenu();
+    }catch(e){ console.error(e); }
 }
 
-/*
-Function:
-Render admin menu cards
+function renderCategoryManager(){
+    const list = document.getElementById('adminCatList');
+    if(!list) return;
+    list.innerHTML = globalCategories.map(cat=>`
+        <div class="cat-tag">
+            <span>${cat.label}</span>
+            <span style="color:#b2bec3;font-size:11px;margin-left:2px;">(${cat.id})</span>
+            <button class="del-cat" onclick="deleteCategory('${cat.id}')" title="刪除分類">✕</button>
+        </div>
+    `).join('');
+}
 
-Input:
-menu item array
+function renderAdminFilterBar(){
+    const bar = document.getElementById('adminFilterBar');
+    if(!bar) return;
+    const all = `<button class="filter-btn ${adminMenuFilter==='all'?'active':''}" onclick="setAdminFilter('all')">全部</button>`;
+    const cats = globalCategories.map(cat=>`
+        <button class="filter-btn ${adminMenuFilter===cat.id?'active':''}" onclick="setAdminFilter('${cat.id}')">${cat.label}</button>
+    `).join('');
+    bar.innerHTML = all + cats;
+}
 
-Output:
-render admin menu grid
-*/
+function populateCategoryDropdowns(){
+    // 上架表單下拉
+    const sel = document.getElementById('newMenuCategory');
+    if(sel){
+        sel.innerHTML = '<option value="">-- 請選擇分類 --</option>' +
+            globalCategories.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+    }
+    // 編輯 Modal 下拉
+    const editSel = document.getElementById('editProductCategory');
+    if(editSel){
+        editSel.innerHTML = globalCategories.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+    }
+}
+
+function setAdminFilter(catId){
+    adminMenuFilter = catId;
+    renderAdminFilterBar();
+    loadRealMenu();
+}
+
+async function addCategory(){
+    const id    = document.getElementById('newCatId').value.trim();
+    const label = document.getElementById('newCatLabel').value.trim();
+    if(!id || !label){ alert('請填寫分類代碼與名稱'); return; }
+    if(!/^[a-z0-9\-]+$/.test(id)){ alert('分類代碼只能使用小寫英文、數字、連字號'); return; }
+    try{
+        const res  = await fetch('/api/admin/categories',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({id,label})
+        });
+        const data = await res.json();
+        if(data.success){
+            document.getElementById('newCatId').value    = '';
+            document.getElementById('newCatLabel').value = '';
+            loadCategories();
+        } else { alert(data.message); }
+    }catch(e){ alert('新增失敗'); }
+}
+
+async function deleteCategory(catId){
+    if(!confirm(`確定刪除分類「${catId}」？\n（已使用此分類的餐點不受影響）`)) return;
+    try{
+        const res  = await fetch(`/api/admin/categories/${catId}`,{ method:'DELETE' });
+        const data = await res.json();
+        if(data.success) loadCategories();
+    }catch(e){ alert('刪除失敗'); }
+}
+
+/* ── 菜單：載入、渲染（含篩選）── */
+async function loadRealMenu(){
+    try{
+        const res   = await fetch('/api/menu');
+        const items = await res.json();
+        renderAdminMenu(items);
+    }catch(e){ console.error(e); }
+}
+
 function renderAdminMenu(items){
-
-    const grid =
-        document.getElementById(
-            'adminMenuGrid'
-        );
-
+    const grid = document.getElementById('adminMenuGrid');
     grid.innerHTML = '';
 
-    items.forEach(item=>{
+    const catMap = {};
+    globalCategories.forEach(c => catMap[c.id] = c.label);
 
-        const imgPath =
-            item.img.startsWith('http')
+    const filtered = adminMenuFilter === 'all'
+        ? items
+        : items.filter(item => item.category === adminMenuFilter);
+
+    if(filtered.length === 0){
+        grid.innerHTML = `<div style="color:#b2bec3;padding:20px;">此分類目前沒有餐點</div>`;
+        return;
+    }
+
+    filtered.forEach(item=>{
+        const imgPath = item.img.startsWith('http')
             ? item.img
             : `${window.location.origin}/${item.img}`;
+        const catLabel = catMap[item.category] || item.category;
 
         grid.innerHTML += `
-
             <div class="product-card">
-
-                <img
-                    src="${imgPath}"
-                    class="product-img"
+                <img src="${imgPath}" class="product-img"
                     onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-
                 <div class="product-body">
-
-                    <div class="product-name">
-                        ${item.name}
+                    <div style="font-size:11px;color:#e67e22;font-weight:700;margin-bottom:4px;">
+                        ${catLabel}
                     </div>
-
-                    <div class="product-price">
-                        NT$ ${item.price}
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-price">NT$ ${item.price}</div>
+                    <div style="display:flex;gap:8px;margin-top:8px;">
+                        <button class="btn" style="flex:1;background:#dfe6e9;font-size:13px;"
+                            onclick="openEditModal('${item.id}','${item.name.replace(/'/g,"\\'")}',${item.price},'${item.category}')">
+                            ✏️ 編輯
+                        </button>
+                        <button class="btn ${item.active?'btn-danger':'btn-success'}" style="flex:1;font-size:13px;"
+                            onclick="toggleProductActiveReal('${item.id}')">
+                            ${item.active ? '完售' : '供應'}
+                        </button>
                     </div>
-
-                    <button
-                        class="btn ${item.active ? 'btn-danger' : 'btn-success'}"
-                        style="width:100%;"
-                        onclick="toggleProductActiveReal('${item.id}')">
-
-                        ${item.active ? '設為完售' : '恢復供應'}
-
+                    <button class="btn" style="width:100%;margin-top:8px;background:#fff0f0;color:#e74c3c;font-size:13px;"
+                        onclick="deleteProduct('${item.id}','${item.name.replace(/'/g,"\\'")}')">
+                        🗑️ 刪除餐點
                     </button>
-
                 </div>
-
             </div>
-
         `;
-
     });
+}
 
+/* ── 編輯 Modal ── */
+function openEditModal(id, name, price, category){
+    document.getElementById('editProductId').value       = id;
+    document.getElementById('editProductName').value     = name;
+    document.getElementById('editProductPrice').value    = price;
+    populateCategoryDropdowns();
+    document.getElementById('editProductCategory').value = category;
+    document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal(){
+    document.getElementById('editModal').classList.remove('open');
+}
+
+async function submitEditProduct(){
+    const id       = document.getElementById('editProductId').value;
+    const name     = document.getElementById('editProductName').value.trim();
+    const price    = document.getElementById('editProductPrice').value.trim();
+    const category = document.getElementById('editProductCategory').value;
+    if(!name || !price || !category){ alert('請填寫完整資料'); return; }
+    try{
+        const res  = await fetch(`/api/admin/menu/${id}`,{
+            method:'PUT',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({name,price,category})
+        });
+        const data = await res.json();
+        if(data.success){
+            closeEditModal();
+            loadRealMenu();
+        } else { alert(data.message); }
+    }catch(e){ alert('儲存失敗'); }
+}
+
+/* ── 刪除餐點 ── */
+async function deleteProduct(id, name){
+    if(!confirm(`確定要刪除【${name}】？\n此操作無法復原！`)) return;
+    try{
+        const res  = await fetch(`/api/admin/menu/${id}`,{ method:'DELETE' });
+        const data = await res.json();
+        if(data.success) loadRealMenu();
+        else alert(data.message);
+    }catch(e){ alert('刪除失敗'); }
 }
 
 /*
@@ -1367,17 +1504,6 @@ global order data
 Output:
 render charts
 */
-function toggleItemDone(checkbox){
-    const span = checkbox.nextElementSibling;
-    if(checkbox.checked){
-        span.style.textDecoration = 'line-through';
-        span.style.color = '#b2bec3';
-    } else {
-        span.style.textDecoration = 'none';
-        span.style.color = '';
-    }
-}
-
 function calculateAndRenderCharts(){
 
     let totalRevenue = 0;
@@ -1516,6 +1642,30 @@ function calculateAndRenderCharts(){
 }
 
 </script>
+
+<!-- ── 編輯餐點 Modal ── -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-title">✏️ 編輯餐點</div>
+        <input type="hidden" id="editProductId">
+        <div class="modal-row">
+            <label>餐點名稱</label>
+            <input type="text" id="editProductName" class="form-control" placeholder="餐點名稱">
+        </div>
+        <div class="modal-row">
+            <label>價格 (NT$)</label>
+            <input type="number" id="editProductPrice" class="form-control" placeholder="價格">
+        </div>
+        <div class="modal-row">
+            <label>分類</label>
+            <select id="editProductCategory" class="form-control"></select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-success" style="flex:1;" onclick="submitEditProduct()">💾 儲存</button>
+            <button class="btn" style="flex:1;background:#dfe6e9;" onclick="closeEditModal()">取消</button>
+        </div>
+    </div>
+</div>
 
 </body>
 

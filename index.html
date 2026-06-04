@@ -295,6 +295,31 @@ body{
     font-weight:700;
 }
 
+.filter-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+}
+
+.filter-btn{
+    border:2px solid #dfe6e9;
+    background:white;
+    border-radius:20px;
+    padding:8px 18px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.15s;
+}
+
+.filter-btn:hover,
+.filter-btn.active{
+    border-color:#e67e22;
+    background:#e67e22;
+    color:white;
+}
+
 @media(max-width:900px){
 
     .container{
@@ -319,6 +344,7 @@ body{
 <div class="container">
 
     <div>
+        <div class="filter-bar" id="menuFilterBar"></div>
         <div class="menu-grid" id="menuGrid"></div>
     </div>
 
@@ -412,17 +438,6 @@ body{
                 id="pickupTime">
         </div>
 
-        <div class="form-group">
-            <label>備註（選填）</label>
-
-            <textarea
-                id="customerNote"
-                class="form-control"
-                placeholder="例：不要加蔥、少冰、加辣..."
-                rows="3"
-                style="resize:vertical;"></textarea>
-        </div>
-
         <button 
             class="submit-btn"
             onclick="submitOrder()">
@@ -462,8 +477,9 @@ body{
 <script>
 
 let cart = [];
-
 let currentSubmittedOrderId = null;
+let allMenuItems = [];
+let currentFilter = 'all';
 
 /*
 Function:
@@ -476,21 +492,37 @@ Output:
 render menu UI
 */
 async function loadMenu(){
-
     try{
-
-        const response = await fetch('/api/menu');
-
-        const items = await response.json();
-
-        renderMenu(items);
-
+        const [menuRes, catRes] = await Promise.all([
+            fetch('/api/menu'),
+            fetch('/api/categories')
+        ]);
+        allMenuItems = await menuRes.json();
+        const categories = await catRes.json();
+        renderFilterBar(categories);
+        renderMenu(allMenuItems);
     }catch(error){
-
         alert('菜單載入失敗');
-
     }
+}
 
+function renderFilterBar(categories){
+    const bar = document.getElementById('menuFilterBar');
+    const all = `<button class="filter-btn active" onclick="setFilter('all',this)">🍽️ 全部</button>`;
+    const cats = categories.map(cat =>
+        `<button class="filter-btn" onclick="setFilter('${cat.id}',this)">${cat.label}</button>`
+    ).join('');
+    bar.innerHTML = all + cats;
+}
+
+function setFilter(catId, btn){
+    currentFilter = catId;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = catId === 'all'
+        ? allMenuItems
+        : allMenuItems.filter(item => item.category === catId);
+    renderMenu(filtered);
 }
 
 /*
@@ -858,8 +890,7 @@ if (!phoneRegex.test(phone)) { alert( '📱 手機號碼格式錯誤！\n請輸�
         pickupTime:pickupTime,
 
         items: cart.map(item => { return `${item.name} (數量:${item.quantity}, 單價:${item.price})`; }),
-        total:calculateTotal(),
-        note: document.getElementById('customerNote').value.trim() || '無'
+        total:calculateTotal()
 
     };
 
@@ -914,10 +945,6 @@ if (!phoneRegex.test(phone)) { alert( '📱 手機號碼格式錯誤！\n請輸�
 
             document.getElementById(
                 'pickupTimeSelect'
-            ).value = '';
-
-            document.getElementById(
-                'customerNote'
             ).value = '';
 
         }else{

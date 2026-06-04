@@ -73,7 +73,7 @@
     },
     {
         "id": "p10",
-        "name": "研磨拿鐵咖啡 (熱)",
+        "name": "研磨拿鐵咖啡(熱)",
         "price": 55,
         "category": "drink",
         "img": "src/images/熱拿鐵咖啡.webp",

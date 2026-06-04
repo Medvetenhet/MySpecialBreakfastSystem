@@ -13,7 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname))); // 讓根目錄下的 圖片.jpg 都能被靜態讀取
 
-const MENU_FILE_PATH = path.join(__dirname, 'menu.json');
+const MENU_FILE_PATH       = path.join(__dirname, 'menu.json');
+const CATEGORIES_FILE_PATH = path.join(__dirname, 'categories.json');
 
 /* ==========================================================================
    📸 Multer 配置：自動檢查格式並強制更名為「餐點名.jpg」
@@ -52,6 +53,90 @@ app.get('/api/menu', (req, res) => {
     fs.readFile(MENU_FILE_PATH, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ success: false, message: '無法讀取菜單' });
         res.json(JSON.parse(data));
+    });
+});
+
+/* ==========================================================================
+   🏷️  分類管理 API 專區
+   ========================================================================== */
+
+// 🔄 【讀取分類】
+app.get('/api/categories', (req, res) => {
+    fs.readFile(CATEGORIES_FILE_PATH, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ success: false, message: '無法讀取分類' });
+        res.json(JSON.parse(data));
+    });
+});
+
+// 🔄 【新增分類】
+app.post('/api/admin/categories', (req, res) => {
+    const { id, label } = req.body;
+    if (!id || !label) return res.json({ success: false, message: '欄位不完整' });
+
+    fs.readFile(CATEGORIES_FILE_PATH, 'utf8', (err, data) => {
+        let cats = err ? [] : JSON.parse(data);
+        if (cats.find(c => c.id === id))
+            return res.json({ success: false, message: '分類 ID 已存在' });
+        cats.push({ id: id.trim(), label: label.trim() });
+        fs.writeFile(CATEGORIES_FILE_PATH, JSON.stringify(cats, null, 4), 'utf8', (err) => {
+            if (err) return res.status(500).json({ success: false });
+            res.json({ success: true });
+        });
+    });
+});
+
+// 🔄 【刪除分類】
+app.delete('/api/admin/categories/:id', (req, res) => {
+    const catId = req.params.id;
+    fs.readFile(CATEGORIES_FILE_PATH, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ success: false });
+        let cats = JSON.parse(data);
+        cats = cats.filter(c => c.id !== catId);
+        fs.writeFile(CATEGORIES_FILE_PATH, JSON.stringify(cats, null, 4), 'utf8', (err) => {
+            if (err) return res.status(500).json({ success: false });
+            res.json({ success: true });
+        });
+    });
+});
+
+// 🔄 【編輯菜單餐點（名稱、價格、分類）】
+app.put('/api/admin/menu/:id', (req, res) => {
+    const productId = req.params.id;
+    const { name, price, category } = req.body;
+    if (!name || !price || !category)
+        return res.json({ success: false, message: '欄位不完整' });
+
+    fs.readFile(MENU_FILE_PATH, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ success: false });
+        let menu = JSON.parse(data);
+        const product = menu.find(item => item.id === productId);
+        if (!product) return res.status(404).json({ success: false, message: '找不到餐點' });
+
+        product.name     = name.trim();
+        product.price    = parseInt(price, 10);
+        product.category = category;
+
+        fs.writeFile(MENU_FILE_PATH, JSON.stringify(menu, null, 4), 'utf8', (err) => {
+            if (err) return res.status(500).json({ success: false });
+            res.json({ success: true, message: `【${product.name}】已更新` });
+        });
+    });
+});
+
+// 🔄 【刪除菜單餐點】
+app.delete('/api/admin/menu/:id', (req, res) => {
+    const productId = req.params.id;
+    fs.readFile(MENU_FILE_PATH, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ success: false });
+        let menu = JSON.parse(data);
+        const before = menu.length;
+        menu = menu.filter(item => item.id !== productId);
+        if (menu.length === before)
+            return res.status(404).json({ success: false, message: '找不到餐點' });
+        fs.writeFile(MENU_FILE_PATH, JSON.stringify(menu, null, 4), 'utf8', (err) => {
+            if (err) return res.status(500).json({ success: false });
+            res.json({ success: true });
+        });
     });
 });
 

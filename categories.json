@@ -1,0 +1,7 @@
+[
+    { "id": "egg-roll", "label": "美味蛋餅" },
+    { "id": "burger",   "label": "經典漢堡" },
+    { "id": "toast",    "label": "人氣吐司" },
+    { "id": "snack",    "label": "精選小食" },
+    { "id": "drink",    "label": "晨調飲品" }
+]
