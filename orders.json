@@ -1,0 +1,14 @@
+[
+    {
+        "id": "ORD-1780558926705",
+        "phone": "0968926667",
+        "email": "anthony.ho667@gmail.com",
+        "pickupTime": "15:46",
+        "items": [
+            "起司豬排堡 (數量:2, 單價:65)"
+        ],
+        "total": 130,
+        "status": "cancelled",
+        "createdAt": "2026-06-04T07:42:06.724Z"
+    }
+]
